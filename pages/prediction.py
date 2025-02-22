@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import predict_next_word, split_into_sentences
 
-st.title("N-Gram Predictive Model")
+st.title("Next Word Prediction")
 
 corpus = st.text_area("Enter your corpus:")
 n = st.number_input("Choose N for N-grams (e.g., 2 for bigram, 3 for trigram):", min_value=1, max_value=5, value=2)
@@ -11,4 +11,4 @@ if corpus:
     
     if user_input:
         prediction = predict_next_word(split_into_sentences(corpus), user_input, n)
-        st.write(f"Predicted next word: {prediction}")
+        st.subheader(f"\"{prediction}\"")

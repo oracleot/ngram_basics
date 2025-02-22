@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import get_ngrams_stats
 
-st.title("N-Gram Analysis")
+st.title("Corpus Analysis")
 st.write("Provide your corpus and select model to visualise word split")
 
 # Text input for the corpus
