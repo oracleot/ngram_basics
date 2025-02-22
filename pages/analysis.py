@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import analyse_ngrams, most_occuring_word
+from utils import get_ngrams_stats
 
 st.title("N-Gram Analysis")
 st.write("Provide your corpus and select model to visualise word split")
@@ -21,15 +21,11 @@ if user_input:
     model_number = models.index(n) + 1
     
     # Count n-grams based on the selected model number
-    ngram_counts = analyse_ngrams(corpus, model_number)
+    ngram_counts = get_ngrams_stats(corpus, model_number)
 
     # Prepare data for display with n-gram, count, and percentage
     ngram_data = [{'Word': ' '.join(ngram), 'Count': count, 'Percentage': f"{percentage:.2f}%"} 
                 for ngram, count, percentage in ngram_counts]
-    
-    # Print most occurring word
-    most_common_word, most_common_count = most_occuring_word(ngram_counts)
-    st.write(f"The most occurring word is \"{most_common_word}\" appearing ({most_common_count} times)")
 
     # Display the n-grams, their counts, and percentages in a table
     st.table(ngram_data)

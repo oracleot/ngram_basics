@@ -7,11 +7,16 @@ def load_corpus(filename):
     with open(filename, "r", encoding="utf-8") as f:
         return [line.strip() for line in f.readlines()]
     
+# Split the text into sentences
+def split_into_sentences(text):
+    return re.split(r'(?<=[.!?]) +', text)
+    
 # Clean a sentence by removing non-alphabetic characters and converting to lowercase
-def clean(sentence):
-    return re.sub(r"[^a-zA-Z\s]", "", sentence).lower()
+def clean(text):
+    return re.sub(r'[^a-zA-Z\s]', '', text).lower()
 
-def analyse_ngrams(corpus, n):
+# Analyse the n-grams in the corpus and return the statistics
+def get_ngrams_stats(corpus, n):
     ngrams = []  # This will store the n-grams
     all_words = []  # This will hold all words from the corpus in order
 
@@ -32,10 +37,27 @@ def analyse_ngrams(corpus, n):
     total_ngrams = sum(ngram_counts.values())
     
     # Create a list of tuples: (ngram, count, percentage)
-    ngram_percentages = [(ngram, count, (count / total_ngrams) * 100) 
+    ngram_stats = [(ngram, count, (count / total_ngrams) * 100) 
                          for ngram, count in ngram_counts.items()]
     
-    return ngram_percentages  # List of (ngram, count, percentage) tuples
+    return ngram_stats
+
+# Analyse the n-grams in the corpus and return the counts
+def get_ngrams_count(corpus, n):
+    ngrams = []
+    all_words = []
+    
+    for sentence in corpus:
+        words = clean(sentence).split()  # Split into words after cleaning
+        all_words.extend(words)
+    
+    for i in range(len(all_words) - n + 1):
+        ngram = tuple(all_words[i:i + n])
+        ngrams.append(ngram)
+    
+    ngram_counts = Counter(ngrams)
+    
+    return ngram_counts  # Return only the counts for efficiency
 
 # Find the most occurring word
 def most_occuring_word(ngram_counts):
@@ -47,16 +69,27 @@ def most_occuring_word(ngram_counts):
     
     return most_common_ngram[0][0], most_common_ngram[1]  # Extract the word and its count
 
-def predict_next_word(ngram_counts, input_text, n):
-    words = clean(input_text).split()
+# Predict the next word based on the context
+def predict_next_word(corpus, phrase, n):
+    ngram_counts = get_ngrams_count(corpus, n)
+    words = clean(phrase).split()
     
     if len(words) < n - 1:
-        return "Please provide more context."
+        return "gibberish"  # Not enough words to form a valid context
     
-    key = tuple(words[-(n-1):])
-    possible_next_words = [ngram[-1] for ngram in ngram_counts if ngram[:-1] == key]
+    context = tuple(words[-(n-1):])  # Get the last (n-1) words as context
+    candidates = {}
+
+    # Iterate through ngram_counts to find matches with context
+    for ngram, count in ngram_counts.items():
+        if ngram[:-1] == context:  # Compare the first (n-1) words of the n-gram with context
+            candidates[ngram[-1]] = count
     
-    if not possible_next_words:
-        return "word not found"
+    if not candidates:
+        return "gibberish"
     
-    return random.choice(possible_next_words)
+    # Find the word with the highest frequency
+    max_freq = max(candidates.values())
+    top_choices = [word for word, freq in candidates.items() if freq == max_freq]
+    
+    return random.choice(top_choices) if len(top_choices) > 1 else top_choices[0]
