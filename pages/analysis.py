@@ -1,11 +1,14 @@
 import streamlit as st
-from utils import get_ngrams_stats
+from utils import get_ngrams_stats, total_words_len
 
 st.title("Corpus Analysis")
 st.write("Provide your corpus and select model to visualise word split")
 
 # Text input for the corpus
 user_input = st.text_area("Enter the corpus (sentences separated by line breaks):", height=200)
+
+if user_input:
+    st.subheader(f"{total_words_len(user_input)} words")
 
 # Define a list of models
 models = ["Unigram", "Bigram", "Trigram", "4-gram", "5-gram", "6-gram", "7-gram", "8-gram"]

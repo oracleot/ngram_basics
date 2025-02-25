@@ -38,7 +38,10 @@ def get_ngrams_stats(corpus, n):
     
     # Create a list of tuples: (ngram, count, percentage)
     ngram_stats = [(ngram, count, (count / total_ngrams) * 100) 
-                         for ngram, count in ngram_counts.items()]
+                   for ngram, count in ngram_counts.items()]
+    
+    # Sort the list by count in descending order
+    ngram_stats = sorted(ngram_stats, key=lambda x: x[1], reverse=True)
     
     return ngram_stats
 
@@ -93,3 +96,6 @@ def predict_next_word(corpus, phrase, n):
     top_choices = [word for word, freq in candidates.items() if freq == max_freq]
     
     return random.choice(top_choices) if len(top_choices) > 1 else top_choices[0]
+
+def total_words_len(corpus):
+    return sum(len(clean(sentence).split()) for sentence in corpus)
